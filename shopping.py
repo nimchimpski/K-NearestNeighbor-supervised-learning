@@ -19,9 +19,10 @@ def main():
     X_train, X_test, y_train, y_test = train_test_split(
         evidence, labels, test_size=TEST_SIZE
     )
-    print(f"---X_train: {X_train} X_test: {X_test} y_train: {y_train} y_test: {y_test}")
+    # print(f"---X_train: {X_train} X_test: {X_test} y_train: {y_train} y_test: {y_test}")
     # Train model and make predictions
     model = train_model(X_train, y_train)
+    print(f"---model: {type(model)}")
     predictions = model.predict(X_test)
     sensitivity, specificity = evaluate(y_test, predictions)
 
@@ -94,7 +95,6 @@ def load_data(filename):
                 return 11
 
         for row in reader:
-            print(f"---row[0]= {row[0]}")
             data = []
             data.append(int(row[0])),
             data.append(float(row[1])),
@@ -125,7 +125,9 @@ def train_model(evidence, labels):
     Given a list of evidence lists and a list of labels, return a
     fitted k-nearest neighbor model (k=1) trained on the data.
     """
-    # split the data into training and testing sets
+    print(f"+++train_model()")
+    model =  KNeighborsClassifier(n_neighbors=1)
+    return model.fit(evidence, labels)
 
 
 def evaluate(labels, predictions):
@@ -142,8 +144,22 @@ def evaluate(labels, predictions):
     `specificity` should be a floating-point value from 0 to 1
     representing the "true negative rate": the proportion of
     actual negative labels that were accurately identified.
+
+You may assume that the list of true labels will contain at least one positive label and at least one negative label.
     """
-    raise NotImplementedError
+    print(f"+++evaluate()")
+    counter = 0
+    for label, prediction in zip(labels, predictions):
+        print(f"---label: {label} prediction: {prediction}")
+        if label == prediction:
+            counter += 1
+    print(f"---counter: {counter} len(labels): {len(labels)}")
+    x = len(labels) /counter
+    score = 1/x
+    print(f"---score: {score}")
+
+
+    # return sensitivity, specificity # floats
 
 
 if __name__ == "__main__":
