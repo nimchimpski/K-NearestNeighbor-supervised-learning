@@ -148,15 +148,19 @@ def evaluate(labels, predictions):
 You may assume that the list of true labels will contain at least one positive label and at least one negative label.
     """
     print(f"+++evaluate()")
-    counter = 0
+    sensitivity = 0
+    specificity = 0
     for label, prediction in zip(labels, predictions):
         print(f"---label: {label} prediction: {prediction}")
-        if label == prediction:
-            counter += 1
-    print(f"---counter: {counter} len(labels): {len(labels)}")
-    x = len(labels) /counter
-    score = 1/x
-    print(f"---score: {score}")
+        if label[0] == 1 and prediction == 1:
+            sensitivity += 1
+        elif label[0] == 0 and prediction == 0:
+            specificity += 1
+    sensitivity = sensitivity/len(labels)
+    specificity = specificity/len(labels)
+    print(f"---sensitivity: {sensitivity} specificity: {specificity}")
+    return (sensitivity, specificity)
+  
 
 
     # return sensitivity, specificity # floats
