@@ -3,6 +3,9 @@ import sys
 
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn import svm
+from sklearn.linear_model import Perceptron
+from sklearn.naive_bayes import GaussianNB
 
 TEST_SIZE = 0.4
 
@@ -15,14 +18,17 @@ def main():
 
     # Load data from spreadsheet and split into train and test sets
     evidence, labels = load_data(sys.argv[1])
-    # print(f"---evidence: {evidence} labels: {labels}")
+    # print(f"---len(evidence): {len(evidence)} ")
+    # print(f"---labels: {labels} ")
+    # print(f"---labels type: {type(labels)} ")
     X_train, X_test, y_train, y_test = train_test_split(
         evidence, labels, test_size=TEST_SIZE
     )
-    # print(f"---X_train: {X_train} X_test: {X_test} y_train: {y_train} y_test: {y_test}")
+    # print(f"---length X_train: {len(X_train)} length y_train: {len(y_train)} ")
+    # print(f"---length X_test: {len(X_test)} length y_test: {len(y_test)} ")
+    # print(f"---X_train: {X_train} y_train: {y_train}")
     # Train model and make predictions
     model = train_model(X_train, y_train)
-    print(f"---model: {type(model)}")
     predictions = model.predict(X_test)
     sensitivity, specificity = evaluate(y_test, predictions)
 
@@ -94,7 +100,9 @@ def load_data(filename):
             elif month == "Dec":
                 return 11
 
+        counter = 0
         for row in reader:
+            counter += 1
             data = []
             data.append(int(row[0])),
             data.append(float(row[1])),
@@ -116,8 +124,9 @@ def load_data(filename):
 
             
             evidence.append(data)
-            labels.append([1 if row[17] == "TRUE" else 0])
+            labels.append(1 if row[17] == "TRUE" else 0)
 
+        # print(f"---counter: {counter}")
         return (evidence, labels)
 
 def train_model(evidence, labels):
@@ -125,8 +134,12 @@ def train_model(evidence, labels):
     Given a list of evidence lists and a list of labels, return a
     fitted k-nearest neighbor model (k=1) trained on the data.
     """
-    print(f"+++train_model()")
+    # print(f"+++train_model()")
     model =  KNeighborsClassifier(n_neighbors=1)
+    # model = svm.SVC()
+    # model = Perceptron()
+    # model = GaussianNB()
+    print(f"---model: {model}")
     return model.fit(evidence, labels)
 
 
@@ -147,18 +160,24 @@ def evaluate(labels, predictions):
 
 You may assume that the list of true labels will contain at least one positive label and at least one negative label.
     """
-    print(f"+++evaluate()")
+    # print(f"+++evaluate()")
+    positives = 0
     sensitivity = 0
+    negatives = 0
     specificity = 0
     for label, prediction in zip(labels, predictions):
-        print(f"---label: {label} prediction: {prediction}")
-        if label[0] == 1 and prediction == 1:
-            sensitivity += 1
-        elif label[0] == 0 and prediction == 0:
-            specificity += 1
-    sensitivity = sensitivity/len(labels)
-    specificity = specificity/len(labels)
-    print(f"---sensitivity: {sensitivity} specificity: {specificity}")
+        # print(f"---label: {label} prediction: {prediction}")
+        if label == 1:
+            positives += 1
+            if prediction == 1:
+                sensitivity += 1
+        elif label == 0:
+            negatives += 1
+            if prediction == 0:
+                specificity += 1
+    sensitivity = sensitivity/positives
+    specificity = specificity/negatives
+    # print(f"---sensitivity: {sensitivity} specificity: {specificity}")
     return (sensitivity, specificity)
   
 
